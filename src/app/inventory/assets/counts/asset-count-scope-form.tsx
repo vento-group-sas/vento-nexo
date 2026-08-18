@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type AssetCountScopeFormAction = (formData: FormData) => void | Promise<void>;
 
@@ -88,24 +88,6 @@ export function AssetCountScopeForm({
     if (!locationId) return [];
     return positions.filter((position) => position.location_id === locationId);
   }, [locationId, positions]);
-
-  useEffect(() => {
-    if (areaId && !filteredAreas.some((area) => area.id === areaId)) {
-      setAreaId("");
-    }
-  }, [areaId, filteredAreas]);
-
-  useEffect(() => {
-    if (locationId && !filteredLocations.some((location) => location.id === locationId)) {
-      setLocationId("");
-    }
-  }, [filteredLocations, locationId]);
-
-  useEffect(() => {
-    if (locationPositionId && !filteredPositions.some((position) => position.id === locationPositionId)) {
-      setLocationPositionId("");
-    }
-  }, [filteredPositions, locationPositionId]);
 
   const scopeLabel = locationPositionId
     ? "Ubicación interna"

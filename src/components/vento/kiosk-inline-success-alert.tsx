@@ -13,8 +13,6 @@ export function KioskInlineSuccessAlert({ message, durationMs = 8000 }: Props) {
   useEffect(() => {
     if (!message) return;
 
-    setVisible(true);
-
     const url = new URL(window.location.href);
     url.searchParams.delete("ok");
     url.searchParams.delete("success_message");
@@ -25,11 +23,18 @@ export function KioskInlineSuccessAlert({ message, durationMs = 8000 }: Props) {
       `${url.pathname}${url.search}${url.hash}`
     );
 
-    const timer = window.setTimeout(() => {
-      setVisible(false);
-    }, durationMs);
+    let hideTimer: number | null = null;
+    const showTimer = window.setTimeout(() => {
+      setVisible(true);
+      hideTimer = window.setTimeout(() => {
+        setVisible(false);
+      }, durationMs);
+    }, 0);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(showTimer);
+      if (hideTimer !== null) window.clearTimeout(hideTimer);
+    };
   }, [durationMs, message]);
 
   if (!visible || !message) return null;

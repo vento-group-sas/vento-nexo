@@ -6,8 +6,13 @@
     "dev": "next dev",
     "prebuild": "node scripts/sync-navigation.mjs",
     "build": "next build",
+    "build:ci007": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:ci007",
+    "test:ci007": "node --test scripts/quality/nexo-consumer-baseline-gate.test.mjs",
+    "ci007:baseline": "node scripts/quality/nexo-consumer-baseline-gate.mjs --packages=@vento/contracts,@vento/os-context,@vento/supabase,@vento/ui-web --json",
     "audit:i18n": "node scripts/audit-i18n.mjs",
     "sync:navigation": "node scripts/sync-navigation.mjs",
     "images:optimize-catalog": "node --env-file=.env.local scripts/optimize-catalog-images.mjs"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type AssetLocationFormAction = (formData: FormData) => void | Promise<void>;
 
@@ -71,6 +71,12 @@ function positionLabel(position: PositionRow, locationById: Map<string, Location
     .join(" · ");
 }
 
+function employeesForSite(employees: EmployeeRow[], siteId: string) {
+  if (!siteId) return employees;
+  const sameSite = employees.filter((employee) => employee.site_id === siteId);
+  return sameSite.length > 0 ? sameSite : employees;
+}
+
 export function AssetLocationForm({
   action,
   item,
@@ -109,38 +115,10 @@ export function AssetLocationForm({
     return positions.filter((position) => position.location_id === locationId);
   }, [locationId, positions]);
 
-  const filteredEmployees = useMemo(() => {
-    if (!siteId) return employees;
-    const sameSite = employees.filter((employee) => employee.site_id === siteId);
-    return sameSite.length > 0 ? sameSite : employees;
-  }, [employees, siteId]);
-
-  useEffect(() => {
-    if (areaId && !filteredAreas.some((area) => area.id === areaId)) {
-      setAreaId("");
-    }
-  }, [areaId, filteredAreas]);
-
-  useEffect(() => {
-    if (locationId && !filteredLocations.some((location) => location.id === locationId)) {
-      setLocationId("");
-    }
-  }, [filteredLocations, locationId]);
-
-  useEffect(() => {
-    if (locationPositionId && !filteredPositions.some((position) => position.id === locationPositionId)) {
-      setLocationPositionId("");
-    }
-  }, [filteredPositions, locationPositionId]);
-
-  useEffect(() => {
-    if (
-      responsibleEmployeeId &&
-      !filteredEmployees.some((employee) => employee.id === responsibleEmployeeId)
-    ) {
-      setResponsibleEmployeeId("");
-    }
-  }, [filteredEmployees, responsibleEmployeeId]);
+  const filteredEmployees = useMemo(
+    () => employeesForSite(employees, siteId),
+    [employees, siteId]
+  );
 
   const selectedLocation = locationId ? locationById.get(locationId) ?? null : null;
   const selectedPosition = locationPositionId
@@ -165,10 +143,18 @@ export function AssetLocationForm({
             name="site_id"
             value={siteId}
             onChange={(event) => {
-              setSiteId(event.target.value);
+              const nextSiteId = event.target.value;
+              const nextEmployees = employeesForSite(employees, nextSiteId);
+              setSiteId(nextSiteId);
               setAreaId("");
               setLocationId("");
               setLocationPositionId("");
+              if (
+                responsibleEmployeeId &&
+                !nextEmployees.some((employee) => employee.id === responsibleEmployeeId)
+              ) {
+                setResponsibleEmployeeId("");
+              }
             }}
             className="ui-input"
           >
@@ -215,8 +201,15 @@ export function AssetLocationForm({
               setLocationPositionId("");
 
               if (nextLocation) {
+                const nextEmployees = employeesForSite(employees, nextLocation.site_id);
                 setSiteId(nextLocation.site_id);
                 setAreaId(nextLocation.area_id);
+                if (
+                  responsibleEmployeeId &&
+                  !nextEmployees.some((employee) => employee.id === responsibleEmployeeId)
+                ) {
+                  setResponsibleEmployeeId("");
+                }
               }
             }}
             className="ui-input"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type CountLineAction = (formData: FormData) => void | Promise<void>;
 
@@ -142,33 +142,6 @@ export function AssetCountLineActions({
       setLocationPositionId("");
     }
   };
-
-  useEffect(() => {
-    if (!statusNeedsFoundLocation(countStatus)) {
-      setSiteId("");
-      setAreaId("");
-      setLocationId("");
-      setLocationPositionId("");
-    }
-  }, [countStatus]);
-
-  useEffect(() => {
-    if (areaId && !filteredAreas.some((area) => area.id === areaId)) {
-      setAreaId("");
-    }
-  }, [areaId, filteredAreas]);
-
-  useEffect(() => {
-    if (locationId && !filteredLocations.some((location) => location.id === locationId)) {
-      setLocationId("");
-    }
-  }, [filteredLocations, locationId]);
-
-  useEffect(() => {
-    if (locationPositionId && !filteredPositions.some((position) => position.id === locationPositionId)) {
-      setLocationPositionId("");
-    }
-  }, [filteredPositions, locationPositionId]);
 
   const shouldShowFoundLocation = statusNeedsFoundLocation(countStatus);
 

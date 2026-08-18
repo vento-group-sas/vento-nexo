@@ -44,11 +44,17 @@ export function LocationBoardAutoRefresh({ intervalSeconds = 60, staleAfterSecon
   const staleAfterMs = safeStaleAfter * 1000;
   const [status, setStatus] = useState(`Actualiza en ${safeInterval}s`);
   const [isPending, startTransition] = useTransition();
-  const deadlineRef = useRef(Date.now() + intervalMs);
-  const lastRefreshRef = useRef(Date.now());
+  const deadlineRef = useRef(0);
+  const lastRefreshRef = useRef(0);
   const isRefreshingRef = useRef(false);
   const pendingRefreshRef = useRef(false);
   const releaseTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const now = Date.now();
+    deadlineRef.current = now + intervalMs;
+    lastRefreshRef.current = now;
+  }, [intervalMs]);
 
   const releaseRefreshing = useCallback(() => {
     if (releaseTimerRef.current) {

@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url';
 
 export const CI007_INSTANCE_ID = 'SHELL-CI-007::GLOBAL';
 export const CI007_SCHEMA_VERSION = 1;
-export const CONSUMER_REPOSITORY = 'devVentoGroup/vento-nexo';
+export const CONSUMER_REPOSITORY = 'vento-group-sas/vento-nexo';
 export const CONSUMER_NAME = 'vento-nexo';
 
 export const CANONICAL_PACKAGES = Object.freeze([

@@ -79,29 +79,32 @@ export function TransfersForm({
   const [draftLoaded, setDraftLoaded] = useState(false);
 
   useEffect(() => {
-    if (clearDraft) {
-      window.localStorage.removeItem(TRANSFER_DRAFT_STORAGE_KEY);
-      setDraftLoaded(true);
-      return;
-    }
+    const frame = window.requestAnimationFrame(() => {
+      if (clearDraft) {
+        window.localStorage.removeItem(TRANSFER_DRAFT_STORAGE_KEY);
+        setDraftLoaded(true);
+        return;
+      }
 
-    const raw = window.localStorage.getItem(TRANSFER_DRAFT_STORAGE_KEY);
-    if (!raw) {
-      setDraftLoaded(true);
-      return;
-    }
+      const raw = window.localStorage.getItem(TRANSFER_DRAFT_STORAGE_KEY);
+      if (!raw) {
+        setDraftLoaded(true);
+        return;
+      }
 
-    try {
-      const draft = JSON.parse(raw) as Partial<TransferDraft>;
-      setFromLocId(String(draft.fromLocId ?? ""));
-      setToLocId(String(draft.toLocId ?? ""));
-      setNotes(String(draft.notes ?? ""));
-      setRows(Array.isArray(draft.rows) && draft.rows.length ? draft.rows : emptyRows);
-    } catch {
-      window.localStorage.removeItem(TRANSFER_DRAFT_STORAGE_KEY);
-    } finally {
-      setDraftLoaded(true);
-    }
+      try {
+        const draft = JSON.parse(raw) as Partial<TransferDraft>;
+        setFromLocId(String(draft.fromLocId ?? ""));
+        setToLocId(String(draft.toLocId ?? ""));
+        setNotes(String(draft.notes ?? ""));
+        setRows(Array.isArray(draft.rows) && draft.rows.length ? draft.rows : emptyRows);
+      } catch {
+        window.localStorage.removeItem(TRANSFER_DRAFT_STORAGE_KEY);
+      } finally {
+        setDraftLoaded(true);
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [clearDraft]);
 
   useEffect(() => {

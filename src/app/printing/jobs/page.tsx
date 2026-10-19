@@ -274,11 +274,11 @@ function PrintingJobsContent() {
     setPreviewZpl
   );
 
-  useEffect(() => {
-    if (!activeLayout) return;
+  const activeLayoutZpl = useMemo(() => {
+    if (!activeLayout) return null;
     const first = previewItems[0] ?? { code: "EJEMPLO-001", note: "Demo" };
     const origin = baseUrl.replace(/\/$/, "");
-    const zpl = templateToZplBatch(activeLayout, [
+    return templateToZplBatch(activeLayout, [
       {
         code: first.code,
         ventoCode: encodeVento("LOC", first.code),
@@ -286,7 +286,6 @@ function PrintingJobsContent() {
         description: first.note ?? "",
       },
     ]);
-    setPreviewZpl(zpl);
   }, [activeLayout, baseUrl, previewItems]);
 
   useEffect(() => {
@@ -603,7 +602,8 @@ function PrintingJobsContent() {
   }
 
   const hasQueue = parsedQueue.length > 0;
-  const previewZplHasError = previewZpl.startsWith("// Error");
+  const displayedPreviewZpl = activeLayoutZpl ?? previewZpl;
+  const previewZplHasError = displayedPreviewZpl.startsWith("// Error");
   const previewShowImage = false;
   const previewShowMock = !previewZplHasError;
   const previewLocVariant =
@@ -867,7 +867,7 @@ function PrintingJobsContent() {
             dpmm={dpmm}
             previewScale={previewScale}
             setPreviewScale={setPreviewScale}
-            previewZpl={previewZpl}
+            previewZpl={displayedPreviewZpl}
             previewZplHasError={previewZplHasError}
             previewShowMock={previewShowMock}
             showZplCode={showZplCode}

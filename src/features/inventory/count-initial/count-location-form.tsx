@@ -26,7 +26,12 @@ type Props = {
 type Filter = "all" | "pending" | "counted";
 const PAGE_SIZE = 30;
 
-export function CountLocationForm({
+export function CountLocationForm(props: Props) {
+  const locationKey = `nexo:count-location:${props.siteId}:${props.locationId}`;
+  return <CountLocationFormContent key={locationKey} {...props} />;
+}
+
+function CountLocationFormContent({
   products,
   siteId,
   siteName,

@@ -26,7 +26,12 @@ type Props = {
 type Filter = "all" | "pending" | "counted";
 const PAGE_SIZE = 30;
 
-export function CountLocationForm({
+export function CountLocationForm(props: Props) {
+  const locationKey = `nexo:count-location:${props.siteId}:${props.locationId}`;
+  return <CountLocationFormContent key={locationKey} {...props} />;
+}
+
+function CountLocationFormContent({
   products,
   siteId,
   siteName,
@@ -46,14 +51,17 @@ export function CountLocationForm({
   const [restored, setRestored] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (raw) setEntries(JSON.parse(raw));
-    } catch {
-      window.localStorage.removeItem(storageKey);
-    } finally {
-      setRestored(true);
-    }
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        const raw = window.localStorage.getItem(storageKey);
+        if (raw) setEntries(JSON.parse(raw));
+      } catch {
+        window.localStorage.removeItem(storageKey);
+      } finally {
+        setRestored(true);
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [storageKey]);
 
   useEffect(() => {

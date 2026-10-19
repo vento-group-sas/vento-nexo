@@ -158,27 +158,30 @@ export function ProductSuppliersEditor({
 
   useEffect(() => {
     if (!hasErrorParam || restoredFromDraft || typeof window === "undefined") return;
-    const raw = window.sessionStorage.getItem(draftKey);
-    if (!raw) {
-      setRestoredFromDraft(true);
-      return;
-    }
-    try {
-      const parsed = JSON.parse(raw) as SupplierLine[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setLines(parsed);
+    const frame = window.requestAnimationFrame(() => {
+      const raw = window.sessionStorage.getItem(draftKey);
+      if (!raw) {
+        setRestoredFromDraft(true);
+        return;
       }
-    } catch {
-      // ignore invalid draft
-    } finally {
-      setRestoredFromDraft(true);
-    }
+      try {
+        const parsed = JSON.parse(raw) as SupplierLine[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setLines(parsed);
+        }
+      } catch {
+        // ignore invalid draft
+      } finally {
+        setRestoredFromDraft(true);
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [draftKey, hasErrorParam, restoredFromDraft]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || (hasErrorParam && !restoredFromDraft)) return;
     window.sessionStorage.setItem(draftKey, JSON.stringify(lines));
-  }, [draftKey, lines]);
+  }, [draftKey, hasErrorParam, lines, restoredFromDraft]);
 
   useEffect(() => {
     if (!stockUnitCodeFieldId) return;

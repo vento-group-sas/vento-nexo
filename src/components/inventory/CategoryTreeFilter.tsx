@@ -151,13 +151,18 @@ export function CategoryTreeFilter({
   nonSelectableHint = "Solo informativa",
 }: CategoryTreeFilterProps) {
   const [query, setQuery] = useState("");
-  const [value, setValue] = useState(selectedCategoryId);
+  const [selection, setSelection] = useState({
+    source: selectedCategoryId,
+    value: selectedCategoryId,
+  });
+  if (selection.source !== selectedCategoryId) {
+    setSelection({ source: selectedCategoryId, value: selectedCategoryId });
+  }
+  const value = selection.source === selectedCategoryId ? selection.value : selectedCategoryId;
+  const setValue = (nextValue: string) =>
+    setSelection({ source: selectedCategoryId, value: nextValue });
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setValue(selectedCategoryId);
-  }, [selectedCategoryId]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -256,6 +261,7 @@ export function CategoryTreeFilter({
     selectionMode,
   ]);
 
+  const availableValue = options.some((option) => option.id === value) ? value : "";
   const normalizedQuery = toSearchLabel(query);
 
   const filtered = useMemo(() => {
@@ -266,20 +272,12 @@ export function CategoryTreeFilter({
   }, [normalizedQuery, options]);
 
   const selectedOption = useMemo(
-    () => options.find((option) => option.id === value) ?? null,
-    [options, value],
+    () => options.find((option) => option.id === availableValue) ?? null,
+    [options, availableValue],
   );
 
-  useEffect(() => {
-    if (!value) return;
-    const stillAvailable = options.some((option) => option.id === value);
-    if (!stillAvailable) {
-      setValue("");
-    }
-  }, [options, value]);
-
   const selectedInFiltered = Boolean(
-    filtered.find((option) => option.id === value),
+    filtered.find((option) => option.id === availableValue),
   );
   const visibleOptions =
     selectedOption && !selectedInFiltered
@@ -309,7 +307,7 @@ export function CategoryTreeFilter({
       <input
         type="hidden"
         name={name}
-        value={value}
+        value={availableValue}
         data-required-custom={required ? "true" : undefined}
         data-required-label={required ? label : undefined}
       />
@@ -346,7 +344,7 @@ export function CategoryTreeFilter({
                 setIsOpen(false);
               }}
               className={`block w-full border-b border-[var(--ui-border)] px-3 py-2 text-left text-sm hover:bg-[var(--ui-surface)] ${
-                value === "" ? "bg-[var(--ui-surface)] font-semibold" : ""
+                availableValue === "" ? "bg-[var(--ui-surface)] font-semibold" : ""
               }`}
             >
               {emptyOptionLabel}
@@ -364,7 +362,7 @@ export function CategoryTreeFilter({
                     setIsOpen(false);
                   }}
                   className={`flex w-full items-center justify-between border-b border-[var(--ui-border)] px-3 py-2 text-left text-sm last:border-b-0 ${
-                    value === option.id
+                    availableValue === option.id
                       ? "bg-[var(--ui-surface)] font-semibold"
                       : ""
                   } ${

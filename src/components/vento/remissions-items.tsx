@@ -435,7 +435,32 @@ function buildPackagePlan(params: {
   };
 }
 
-export function RemissionsItems({
+export function RemissionsItems(props: Props) {
+  const resetKey = useMemo(
+    () =>
+      JSON.stringify([
+        props.initialRows ?? [],
+        props.defaultAreaKind ?? "",
+        props.products,
+        props.categoryNameById ?? {},
+        props.defaultUomProfiles ?? [],
+        props.defaultRequestPolicies ?? [],
+        props.productionPackageRows ?? [],
+      ]),
+    [
+      props.initialRows,
+      props.defaultAreaKind,
+      props.products,
+      props.categoryNameById,
+      props.defaultUomProfiles,
+      props.defaultRequestPolicies,
+      props.productionPackageRows,
+    ],
+  );
+  return <RemissionsItemsContent key={resetKey} {...props} />;
+}
+
+function RemissionsItemsContent({
   products,
   categoryNameById = {},
   areaOptions,
@@ -603,10 +628,6 @@ export function RemissionsItems({
 
   const [rows, setRows] = useState<Row[]>(normalizedInitialRows);
   const [entryMode, setEntryMode] = useState<"table" | "cards">("table");
-
-  useEffect(() => {
-    setRows(normalizedInitialRows);
-  }, [normalizedInitialRows]);
 
   const rowsWithDerivedPackagePlans = useMemo<RemissionDraftRow[]>(() => {
     return rows.map((row) => {

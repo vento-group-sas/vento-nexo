@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   convertByProductProfile,
@@ -113,7 +113,17 @@ type Props = {
 
 type SiteMode = "simple" | "zonified";
 
-export function RemissionsCreateForm({
+export function RemissionsCreateForm(props: Props) {
+  const defaultsKey = JSON.stringify([
+    props.defaultFromSiteId,
+    props.initialExpectedDate ?? "",
+    props.initialNotes ?? "",
+    props.initialRows ?? [],
+  ]);
+  return <RemissionsCreateFormContent key={defaultsKey} {...props} />;
+}
+
+function RemissionsCreateFormContent({
   action,
   toSiteId,
   toSiteName,
@@ -136,7 +146,6 @@ export function RemissionsCreateForm({
   requiresSharedDeviceActorSignature = false,
 }: Props) {
   const initialRowsSource = useMemo(() => initialRows ?? [], [initialRows]);
-  const initialRowsKey = useMemo(() => JSON.stringify(initialRowsSource), [initialRowsSource]);
   const normalizedInitialRows = useMemo<RemissionDraftRow[]>(
     () =>
       initialRowsSource.map((row, index) => ({
@@ -156,22 +165,6 @@ export function RemissionsCreateForm({
   const [expectedDate, setExpectedDate] = useState(initialExpectedDate);
   const [notes, setNotes] = useState(initialNotes);
   const [draftRows, setDraftRows] = useState<RemissionDraftRow[]>(normalizedInitialRows);
-  useEffect(() => {
-    setFromSiteId(defaultFromSiteId);
-  }, [defaultFromSiteId]);
-
-  useEffect(() => {
-    setExpectedDate(initialExpectedDate);
-  }, [initialExpectedDate]);
-
-  useEffect(() => {
-    setNotes(initialNotes);
-  }, [initialNotes]);
-
-  useEffect(() => {
-    setDraftRows(normalizedInitialRows);
-  }, [initialRowsKey, normalizedInitialRows]);
-
   const selectedFromSite = useMemo(
     () => fromSiteOptions.find((site) => site.id === fromSiteId) ?? null,
     [fromSiteId, fromSiteOptions]
